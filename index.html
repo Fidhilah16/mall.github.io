@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Saldo dan Penyerapan DKS dan BL - PT Pegadaian</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono for clean financials -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Base Global Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Tabular numbers for perfect alignment in financial tables */
+        .num-align {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Aspect Ratio Box for modern screens (16:9 standard slide) */
+        .slide-aspect {
+            aspect-ratio: 16 / 9;
+        }
+
+        /* Elegant Custom Scrollbar for list container */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2FA084;
+            border-radius: 3px;
+        }
+
+        /* Table Head Alignment and Height Improvements */
+        .slide-aspect th,
+        .print-area th {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding-top: 1.25vh !important;
+            padding-bottom: 1.25vh !important;
+            height: 4.8vh !important;
+            font-size: 1.15vh !important;
+            font-weight: 700 !important;
+        }
+
+        .slide-aspect td,
+        .print-area td {
+            vertical-align: middle !important;
+            padding-top: 0.5vh !important;
+            padding-bottom: 0.5vh !important;
+        }
+
+        @media print {
+
+            /* Force browser to default to custom 16:9 landscape dimensions (A4 equivalent width with 16:9 height) */
+            @page {
+                size: 297mm 167.0625mm !important;
+                margin: 0 !important;
+            }
+
+            /* Hide absolutely everything inside the body except our pure-print container */
+            body> :not(#pure-print-wrapper) {
+                display: none !important;
+            }
+
+            /* Enforce strict full viewport size for HTML & Body to prevent page splits */
+            html,
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 297mm !important;
+                height: 167.0625mm !important;
+                overflow: hidden !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Ensure the print wrapper fits exactly the landscape viewport bounds */
+            #pure-print-wrapper {
+                display: block !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 297mm !important;
+                height: auto !important;
+                /* Allow multi-page flow */
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #ffffff !important;
+            }
+
+            /* Each slide container fills the exact physical landscape paper perfectly */
+            .print-area {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                width: 297mm !important;
+                height: 167.0625mm !important;
+                position: relative !important;
+                overflow: hidden !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                box-sizing: border-box !important;
+                background-color: #ffffff !important;
+                padding: 0 !important;
+                /* Zero padding to allow cover slide full stretch */
+            }
+        }
+    </style>
+
+    <!-- Tailwind Color Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pegadaian: {
+                            deep: '#1F6F5F',
+                            medium: '#2FA084',
+                            mint: '#6FCF97',
+                            gray: '#EEEEEE',
+                            dark: '#111827'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-slate-950 transition-colors duration-300">
+
+    <!-- TOP BAR & NAVIGATION (SCREEN ONLY) -->
+    <header
+        class="no-print bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
+        <div class="flex items-center gap-3">
+
+            <div class="border-l border-slate-800 pl-4">
+                <h1 class="text-sm font-semibold text-white">Laporan Keuangan & Penyerapan</h1>
+                <p class="text-xs text-slate-400">Daftar Slide Presentasi 16:9 • Per 31 Mei 2026</p>
+            </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="flex items-center gap-3">
+            <button onclick="toggleViewMode('slide')" id="btn-slide-mode"
+                class="px-4 py-2 text-xs font-semibold rounded-lg bg-pegadaian-deep text-white shadow-lg shadow-pegadaian-deep/20 flex items-center gap-2 border border-pegadaian-medium/30 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                </svg>
+                Mode Slide
+            </button>
+            <button onclick="toggleViewMode('print-preview')" id="btn-print-mode"
+                class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2 border border-slate-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Mode Daftar (Siap Cetak)
+            </button>
+            <button onclick="triggerPrint()"
+                class="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-2 transition-all shadow-lg shadow-amber-600/10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-3a2 2 0 00-2-2H9a2 2 0 00-2 2v3a2 2 0 002 2zm3-12V5a2 2 0 012-2h4a2 2 0 012 2v3m-6 0h6" />
+                </svg>
+                Cetak ke PDF
+            </button>
+            <button onclick="showHelpModal()"
+                class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+                title="Cara Cetak Tanpa Watermark">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN VIEWPORT CONTAINER -->
+    <main class="container mx-auto p-4 md:p-8 flex flex-col items-center justify-center min-h-[calc(100vh-140px)]">
+
+        <!-- INTERACTIVE SLIDE VIEW -->
+        <div id="interactive-viewport"
+            class="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-4 md:p-6 no-print">
+            <!-- Top Actions of Card -->
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span
+                        class="px-2.5 py-1 bg-pegadaian-deep/30 text-pegadaian-mint text-xs font-bold rounded-md">Slide
+                        <span id="current-slide-num-badge">1</span>/7</span>
+                    <span class="text-xs text-slate-400 font-medium hidden sm:inline"
+                        id="slide-title-header">Cover</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button onclick="prevSlide()"
+                        class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button onclick="nextSlide()"
+                        class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slide Viewport (16:9 box) -->
+            <div class="relative w-full slide-aspect bg-white rounded-xl overflow-hidden shadow-inner text-slate-900 border border-slate-200"
+                id="slide-viewport-card">
+                <!-- Slides will render inside here dynamically -->
+                <div id="active-slide-root" class="w-full h-full"></div>
+            </div>
+
+            <!-- Jump Navigation Dots -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mt-6">
+                <span class="text-xs font-semibold text-slate-400 mr-2">Pilih Slide:</span>
+                <button onclick="goToSlide(1)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-pegadaian-deep text-white font-bold text-xs transition-all">1</button>
+                <button onclick="goToSlide(2)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all">2</button>
+                <button onclick="goToSlide(3)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all">3</button>
+                <button onclick="goToSlide(4)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all">4</button>
+                <button onclick="goToSlide(5)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all">5</button>
+                <button onclick="goToSlide(6)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all">6</button>
+                <button onclick="goToSlide(7)"
+                    class="slide-nav-dot w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all">7</button>
+            </div>
+        </div>
+
+        <!-- ALL SLIDES PRINT VIEW (SCROLLABLE & READY TO PRINT) -->
+        <div id="print-view-container" class="hidden w-full flex-col gap-8 items-center justify-center">
+            <div
+                class="no-print w-full max-w-5xl bg-emerald-950/40 border border-emerald-800/60 p-4 rounded-xl text-center mb-4">
+                <p class="text-emerald-400 text-sm font-semibold flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Menampilkan seluruh slide dalam dimensi asli 16:9 Landscape. Siap cetak bebas margin dan tanpa
+                    watermark.
+                </p>
+                <p class="text-xs text-slate-300 mt-1">Gunakan kombinasi tombol <kbd
+                        class="px-1.5 py-0.5 bg-slate-800 rounded font-mono">Ctrl + P</kbd> untuk mencetak atau
+                    menyimpan sebagai file PDF.</p>
+            </div>
+
+            <!-- Slide list container -->
+            <div id="print-slides-list" class="flex flex-col gap-6 items-center justify-center w-full">
+                <!-- Rendered by JavaScript dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <!-- PRINT ONLY CONTINUOUS CONTAINER (This is purely used during window.print()) -->
+    <div id="pure-print-wrapper" class="hidden print:block">
+        <!-- Pure print content generated here by JS -->
+    </div>
+
+    <!-- HELP / PRINT GUIDE DIALOG -->
+    <div id="help-modal"
+        class="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeHelpModal()"
+                class="absolute top-4 right-4 p-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-amber-600/10 text-amber-500 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white">Panduan Cetak PDF Bebas Watermark (16:9)</h3>
+            </div>
+            <div class="space-y-4 text-sm text-slate-300">
+                <p>Agar slide tercetak dengan ukuran penuh landscape 16:9, rapi, dan tanpa informasi tambahan dari
+                    browser di pinggirannya, silakan ikuti langkah-langkah berikut di dialog cetak browser Anda:</p>
+                <ul class="space-y-3 list-decimal pl-5 text-slate-200">
+                    <li><strong>Tujuan (Destination):</strong> Pilih <span class="text-amber-400 font-semibold">Simpan
+                            sebagai PDF (Save as PDF)</span>.</li>
+                    <li><strong>Tata Letak (Layout):</strong> Pilih <span class="text-amber-400 font-semibold">Lanskap
+                            (Landscape)</span>.</li>
+                    <li><strong>Margin (Margins):</strong> Ubah dari Default menjadi <span
+                            class="text-amber-400 font-semibold">Tanpa (None)</span> agar tidak ada ruang kosong di
+                        pinggiran kertas (Full Kertas).</li>
+                    <li><strong>Opsi Lain (More Settings):</strong>
+                        <ul class="list-disc pl-5 mt-1 text-slate-300 space-y-1">
+                            <li>Centang <span class="text-amber-400 font-semibold">Grafik Latar Belakang (Background
+                                    Graphics)</span> agar warna hijau Pegadaian tercetak sempurna.</li>
+                            <li>Hapus centang <span class="text-amber-400 font-semibold">Header dan Footer (Headers and
+                                    Footers)</span> untuk menghapus alamat web/tanggal cetak browser.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeHelpModal()"
+                    class="px-5 py-2.5 bg-pegadaian-deep hover:bg-pegadaian-medium text-white font-semibold text-xs rounded-lg transition-all">Saya
+                    Mengerti</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- STATE MANAGEMENT ---
+        let currentSlide = 1;
+        let viewMode = 'slide'; // 'slide' or 'print-preview'
+
+        // --- DATA TRANSCRIPTION FROM IMAGES & SHEETS ---
+        const slidesData = [
+            {
+                id: 1,
+                type: 'cover',
+                title: "LAPORAN SALDO DAN PENYERAPAN DKS DAN BL",
+                subtitle: "PT Pegadaian",
+                date: "Per Tanggal 31 Mei 2026",
+                note: "Divisi Keuangan & Tanggung Jawab Sosial dan Lingkungan (TJSL)"
+            },
+            {
+                id: 2,
+                type: 'table',
+                title: "SALDO AKHIR REKENING KORAN DKS",
+                subtitle: "PER 31 MEI 2026",
+                source: "NB : Data berasal dari Aplikasi PPMDKS",
+                headers: ["NO", "KANWIL", "REK BRI", "BAGAN AKUN PPMDKS", "SELISIH", "SALDO KAS"],
+                rows: [
+                    ["1", "MEDAN", "1,100,000", "1,829,345,000", "1,828,245,000", "0"],
+                    ["2", "PEKANBARU", "1,100,000", "255,132,500", "254,032,500", "0"],
+                    ["3", "PALEMBANG", "1,100,000", "1,100,000", "-", "0"],
+                    ["4", "BALIKPAPAN", "1,030,000", "86,762,938", "85,732,938", "0"],
+                    ["5", "MANADO", "922,000", "751,639,653", "750,717,653", "0"],
+                    ["6", "MAKASSAR", "856,912", "31,775,000", "30,918,088", "0"],
+                    ["7", "DENPASAR", "1,065,000", "511,270,057", "510,205,057", "0"],
+                    ["8", "JAKARTA VIII", "1,065,000", "308,859,000", "307,794,000", "13,302,000"],
+                    ["9", "JAKARTA IX", "1,030,000", "123,598,000", "122,568,000", "0"],
+                    ["10", "BANDUNG", "995,000", "123,598,000", "122,603,000", "0"],
+                    ["11", "SEMARANG", "1,065,000", "830,115,612", "829,050,612", "300,000,000"],
+                    ["12", "SURABAYA", "1,100,000", "57,470", "-1,042,530", "908,319,743"]
+                ],
+                total: ["TOTAL", "12,428,912", "4,853,253,230", "4,840,824,318", "1,221,621,743"]
+            },
+            {
+                id: 3,
+                type: 'table-nested',
+                hasSerialNo: true,
+                title: "REKAPITULASI PENYALURAN DANA BINA LINGKUNGAN",
+                subtitle: "PER TANGGAL 31 MEI 2026",
+                source: "NB : Data berasal dari SAP (per tgl 31 Mei 2026) dan Aplikasi STREAM & PPMBL (per tanggal 04 Juni 2026)",
+                note: "Untuk data detail penyaluran yang belum d input silahkan cek pada link <a href='https://bit.ly/MonitoringSAP-BL' target='_blank' class='text-amber-400 underline font-semibold hover:text-amber-300'>https://bit.ly/MonitoringSAP-BL</a>",
+                headerStructure: `
+          <tr>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">NO.</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">WILAYAH</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">TARGET BL</th>
+            <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">BIAYA PENYALURAN BINA LINGKUNGAN</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">DATA SAP</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">DATA PPMBL</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">BELUM INPUT PPMBL</th>
+          </tr>
+          <tr>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BUDGET IN</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BUDGET OUT</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">SALDO</th>
+          </tr>
+        `,
+                rows: [
+                    ["1", "KANWIL I MEDAN", "4,248,395,400", "4,248,395,400", "1,228,150,000", "3,020,245,400", "518,450,000", "42,700,000", "475,750,000"],
+                    ["2", "KANWIL II PEKANBARU", "2,164,868,300", "2,196,193,540", "937,950,000", "1,258,243,540", "787,999,760", "470,379,760", "317,620,000"],
+                    ["3", "KANWIL III PALEMBANG", "2,496,474,400", "2,594,428,197", "1,085,867,623", "1,508,560,574", "823,898,476", "831,548,476", "-7,650,000"],
+                    ["4", "KANWIL IV BALIKPAPAN", "4,786,280,600", "4,859,516,169", "1,937,783,024", "2,921,733,145", "1,561,107,455", "1,432,917,455", "128,190,000"],
+                    ["5", "KANWIL V MANADO", "5,051,284,000", "5,143,940,505", "2,609,540,583", "2,534,399,922", "1,973,479,578", "622,709,592", "1,350,769,986"],
+                    ["6", "KANWIL VI MAKASSAR", "7,116,356,000", "7,372,056,000", "3,170,916,960", "4,201,139,040", "1,027,725,060", "833,851,500", "193,873,560"],
+                    ["7", "KANWIL VII DENPASAR", "6,282,675,500", "6,328,090,953", "2,278,231,000", "4,049,859,953", "1,633,981,000", "768,031,000", "865,950,000"],
+                    ["8", "KANWIL VIII JAKARTA 1", "6,077,240,400", "6,363,300,989", "2,076,240,721", "4,287,060,268", "1,336,806,834", "1,043,883,625", "292,923,209"],
+                    ["9", "KANWIL IX JAKARTA 2", "5,476,262,800", "5,745,312,800", "2,568,624,703", "3,176,888,097", "2,060,647,252", "631,396,047", "1,429,251,205"],
+                    ["10", "KANWIL X BANDUNG", "4,033,727,600", "4,064,328,016", "1,648,262,076", "2,416,065,940", "578,726,660", "578,726,660", "-"],
+                    ["11", "KANWIL XI SEMARANG", "5,357,202,200", "5,430,327,359", "1,877,520,354", "3,552,807,005", "1,556,139,545", "318,115,466", "1,238,024,079"],
+                    ["12", "KANWIL XII SURABAYA", "6,408,214,800", "6,467,279,778", "3,743,396,195", "2,723,883,583", "2,870,003,585", "2,843,003,585", "27,000,000"]
+                ],
+                total: ["Grand Total", "59,500,000,000", "60,813,169,706", "25,162,483,239", "35,650,686,467", "16,728,965,205", "10,417,263,166", "6,311,702,039"]
+            },
+            {
+                id: 4,
+                type: 'table-nested',
+                hasSerialNo: true,
+                title: "REKAPITULASI PENYALURAN DANA BINA LINGKUNGAN",
+                subtitle: "BIAYA OPERASIONAL - PER TANGGAL 31 MEI 2026",
+                source: "NB : Data berasal dari SAP (per tgl 31 Mei 2026) dan Aplikasi STREAM & PPMBL (per tanggal 04 Juni 2026)",
+                headerStructure: `
+          <tr>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">NO.</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">WILAYAH</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">DATA SAP (E)</th>
+            <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">BIAYA OPERASIONAL BINA LINGKUNGAN</th>
+            <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">BIAYA OPERASIONAL PROGRAM KEMITRAAN</th>
+          </tr>
+          <tr>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BUDGET IN</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BUDGET OUT</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">SALDO</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BUDGET IN</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BUDGET OUT</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">SALDO</th>
+          </tr>
+        `,
+                rows: [
+                    ["1", "KANWIL I MEDAN", "977,244,620", "212,419,770", "0", "212,419,770", "29,800,000", "0", "29,800,000"],
+                    ["2", "KANWIL II PEKANBARU", "1,542,485,195", "108,243,415", "204,000", "108,039,415", "20,600,000", "0", "20,600,000"],
+                    ["3", "KANWIL III PALEMBANG", "1,150,592,426", "147,555,520", "48,331,800", "99,323,720", "7,900,000", "0", "7,900,000"],
+                    ["4", "KANWIL IV BALIKPAPAN", "2,515,849,217", "239,314,030", "47,621,250", "191,692,780", "22,700,000", "0", "22,700,000"],
+                    ["5", "KANWIL V MANADO", "2,379,555,546", "276,819,749", "103,647,308", "173,122,441", "47,100,000", "0", "47,100,000"],
+                    ["6", "KANWIL VI MAKASSAR", "2,254,111,420", "355,817,800", "19,272,735", "336,545,065", "52,600,000", "0", "52,600,000"],
+                    ["7", "KANWIL VII DENPASAR", "3,073,794,703", "314,133,775", "96,353,600", "217,780,175", "26,700,000", "0", "26,700,000"],
+                    ["8", "KANWIL VIII JAKARTA 1", "1,915,976,705", "328,212,020", "59,154,000", "269,058,020", "9,200,000", "0", "9,200,000"],
+                    ["9", "KANWIL IX JAKARTA 2", "1,266,105,355", "273,828,140", "58,625,218", "215,202,922", "12,300,000", "0", "12,300,000"],
+                    ["10", "KANWIL X BANDUNG", "2,596,945,971", "201,686,380", "0", "201,686,380", "24,300,000", "0", "24,300,000"],
+                    ["11", "KANWIL XI SEMARANG", "1,976,866,604", "267,896,010", "25,393,775", "242,502,235", "11,800,000", "0", "11,800,000"],
+                    ["12", "KANWIL XII SURABAYA", "2,689,786,732", "320,410,740", "9,229,850", "311,180,890", "29,600,000", "0", "29,600,000"]
+                ],
+                total: ["Grand Total", "24,339,314,494", "3,046,437,349", "467,833,536", "2,578,603,813", "294,600,000", "0", "294,600,000"]
+            },
+            {
+                id: 5,
+                type: 'table-nested',
+                hasSerialNo: false,
+                title: "REKAPITULASI PENYALURAN DANA KEPEDULIAN SOSIAL (DKS)",
+                subtitle: "PER WILAYAH PER TANGGAL 31 MEI 2026",
+                source: "NB : Data berasal dari Aplikasi PPMDKS",
+                headerStructure: `
+          <tr>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Wilayah</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Target</th>
+            <th colspan="6" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Pencapaian</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">% Achievement</th>
+          </tr>
+          <tr>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Januari</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Februari</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Maret</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">April</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Mei</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">All</th>
+          </tr>
+        `,
+                rows: [
+                    ["Kanwil Medan", "1,060,000,000", "0", "0", "285,040,000", "93,150,000", "0", "378,190,000", "35.68%"],
+                    ["Kanwil Pekanbaru", "1,060,000,000", "1,322,363,500", "12,900,000", "106,462,450", "177,432,900", "625,763,000", "2,244,921,850", "211.79%"],
+                    ["Kanwil Palembang", "1,060,000,000", "82,200,000", "20,400,000", "243,117,300", "74,450,000", "114,600,000", "534,767,300", "50.45%"],
+                    ["Kanwil Balikpapan", "1,060,000,000", "0", "107,800,000", "251,029,246", "105,425,000", "61,500,000", "525,754,246", "49.60%"],
+                    ["Kanwil Manado", "1,060,000,000", "46,900,000", "0", "100,000,000", "11,700,000", "238,457,500", "397,057,500", "37.46%"],
+                    ["Kanwil Makassar", "1,060,000,000", "0", "0", "0", "0", "2,402,690,000", "2,402,690,000", "226.67%"],
+                    ["Kanwil Denpasar", "1,060,000,000", "0", "0", "0", "0", "0", "0", "0.00%"],
+                    ["Kanwil Jakarta 1", "1,060,000,000", "131,698,000", "0", "0", "1,676,400,000", "0", "1,808,098,000", "170.58%"],
+                    ["Kanwil Jakarta 2", "1,060,000,000", "413,259,000", "180,000,000", "2,547,530,000", "309,900,000", "84,600,000", "3,535,289,000", "333.52%"],
+                    ["Kanwil Bandung", "1,060,000,000", "197,800,000", "7,300,000", "0", "445,393,036", "26,537,592", "677,030,628", "63.87%"],
+                    ["Kanwil Semarang", "1,060,000,000", "156,300,000", "27,500,000", "0", "350,200,000", "392,280,612", "926,280,612", "87.38%"],
+                    ["Kanwil Surabaya", "1,060,000,000", "0", "0", "352,455,111", "0", "23,301,500", "375,756,611", "35.45%"]
+                ],
+                total: ["Total", "12,720,000,000", "2,350,520,500", "355,900,000", "3,885,634,107", "3,244,050,936", "3,969,730,204", "13,805,835,747", "108.54%"]
+            },
+            {
+                id: 6,
+                type: 'table-nested',
+                hasSerialNo: false,
+                title: "REKAPITULASI PENYALURAN BINA LINGKUNGAN (BL)",
+                subtitle: "PER WILAYAH PER TANGGAL 31 MEI 2026",
+                source: "NB : Data berasal dari Aplikasi PPMBL",
+                headerStructure: `
+          <tr>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Wilayah</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Target</th>
+            <th colspan="6" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Pencapaian</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">% Achievement</th>
+          </tr>
+          <tr>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Januari</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Februari</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Maret</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">April</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">Mei</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">All</th>
+          </tr>
+        `,
+                rows: [
+                    ["Kanwil Medan", "4,248,395,400", "0", "0", "0", "42,700,000", "0", "42,700,000", "1.01%"],
+                    ["Kanwil Pekanbaru", "2,164,868,300", "0", "0", "6,000,000", "405,679,760", "53,700,000", "465,379,760", "21.50%"],
+                    ["Kanwil Palembang", "2,496,474,400", "5,000,000", "25,000,000", "151,944,750", "124,082,903", "525,520,823", "831,548,476", "33.31%"],
+                    ["Kanwil Balikpapan", "4,786,280,600", "8,300,000", "0", "229,958,000", "417,535,955", "270,000,000", "925,793,955", "19.34%"],
+                    ["Kanwil Manado", "5,051,284,000", "16,037,000", "71,440,000", "100,058,092", "23,974,000", "411,200,500", "622,709,592", "12.33%"],
+                    ["Kanwil Makassar", "7,116,356,000", "0", "0", "186,000,000", "497,033,500", "6,118,000", "689,151,500", "9.68%"],
+                    ["Kanwil Denpasar", "6,282,675,500", "0", "55,000,000", "146,585,000", "222,000,000", "286,696,000", "710,281,000", "11.31%"],
+                    ["Kanwil Jakarta 1", "6,077,240,400", "0", "0", "146,300,000", "100,250,000", "797,333,625", "1,043,883,625", "17.18%"],
+                    ["Kanwil Jakarta 2", "5,476,262,800", "0", "10,000,000", "154,550,000", "322,387,151", "90,269,344", "577,206,495", "10.54%"],
+                    ["Kanwil Bandung", "4,033,727,600", "0", "42,000,000", "55,000,000", "340,726,660", "141,000,000", "578,726,660", "14.35%"],
+                    ["Kanwil Semarang", "5,357,202,200", "0", "92,960,466", "39,800,000", "135,355,000", "35,000,000", "303,115,466", "5.66%"],
+                    ["Kanwil Surabaya", "6,408,214,800", "0", "174,000,000", "928,439,365", "723,443,481", "1,102,000,000", "2,927,882,846", "45.69%"]
+                ],
+                total: ["Total", "59,500,000,000", "29,337,000", "470,400,466", "2,144,635,207", "3,355,168,410", "3,718,838,292", "9,718,379,375", "16.33%"]
+            },
+            {
+                id: 7,
+                type: 'table-nested',
+                hasSerialNo: false,
+                title: "REKAPITULASI PENYALURAN KANWIL",
+                subtitle: "PER TANGGAL 31 MARET 2026",
+                source: "NB : Data penyerapan per 31 Maret 2026",
+                headerStructure: `
+          <tr>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Wilayah</th>
+            <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Target</th>
+            <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">Pencapaian</th>
+            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">% Achievement</th>
+          </tr>
+          <tr>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BL</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">DKS</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">ALL</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">BL</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">DKS</th>
+            <th class="border border-slate-300 print:border-slate-400 bg-pegadaian-medium text-white px-2 py-0.5 text-center text-[1.1vh] font-bold">All</th>
+          </tr>
+        `,
+                rows: [
+                    ["Kanwil Medan", "4,248,395,400", "1,060,000,000", "5,308,395,400", "42,700,000", "378,190,000", "420,890,000", "7.93%"],
+                    ["Kanwil Pekanbaru", "2,164,868,300", "1,060,000,000", "3,224,868,300", "465,379,760", "1,441,725,950", "1,907,105,710", "59.14%"],
+                    ["Kanwil Palembang", "2,496,474,400", "1,060,000,000", "3,556,474,400", "831,548,476", "345,717,300", "1,177,265,776", "33.10%"],
+                    ["Kanwil Balikpapan", "4,786,280,600", "1,060,000,000", "5,846,280,600", "925,793,955", "358,829,246", "1,284,623,201", "21.97%"],
+                    ["Kanwil Manado", "5,051,284,000", "1,060,000,000", "6,111,284,000", "622,709,592", "146,900,000", "769,609,592", "12.59%"],
+                    ["Kanwil Makassar", "7,116,356,000", "1,060,000,000", "8,176,356,000", "689,151,500", "0", "689,151,500", "8.43%"],
+                    ["Kanwil Denpasar", "6,282,675,500", "1,060,000,000", "7,342,675,500", "710,281,000", "0", "710,281,000", "9.67%"],
+                    ["Kanwil Jakarta 1", "6,077,240,400", "1,060,000,000", "7,137,240,400", "1,043,883,625", "131,698,000", "1,175,581,625", "16.47%"],
+                    ["Kanwil Jakarta 2", "5,476,262,800", "1,060,000,000", "6,536,262,800", "577,206,495", "3,140,789,000", "3,717,995,495", "56.88%"],
+                    ["Kanwil Bandung", "4,033,727,600", "1,060,000,000", "5,093,727,600", "578,726,660", "205,100,000", "783,826,660", "15.39%"],
+                    ["Kanwil Semarang", "5,357,202,200", "1,060,000,000", "6,417,920,200", "303,115,466", "183,800,000", "486,915,466", "7.59%"],
+                    ["Kanwil Surabaya", "6,408,214,800", "1,060,000,000", "7,468,214,800", "2,927,882,846", "352,455,111", "3,280,337,957", "43.92%"]
+                ],
+                total: ["Total", "59,500,000,000", "12,720,000,000", "72,220,000,000", "9,718,379,375", "6,685,204,607", "16,403,583,982", "22.71%"]
+            }
+        ];
+
+        // --- STREAMING_CHUNK:Structuring header and footer generator helpers ... -->
+        function getSlideHeaderHtml(slide, isPrint = false) {
+            return `
+        <div class="flex justify-between items-center border-b pb-[1vh] mb-[1.5vh] h-[8vh]">
+          <div>
+            <h2 class="text-[2.2vh] font-extrabold text-[#1F6F5F] tracking-wide uppercase leading-tight">${slide.title}</h2>
+            <p class="text-[1.4vh] font-semibold text-[#2FA084] mt-[0.2vh]">${slide.subtitle}</p>
+          </div>
+          <div class="flex flex-col items-end justify-center">
+            <!-- Official Logo PT Pegadaian -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Pegadaian_logo_%282013%29.svg/640px-Pegadaian_logo_%282013%29.svg.png" 
+                 class="h-[4.5vh] w-auto object-contain" 
+                 alt="Logo Pegadaian" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/120x60/1f6f5f/ffffff?text=Pegadaian'">
+            <span class="text-[1vh] font-bold text-slate-400 mt-[0.2vh]">PT Pegadaian • TJSL</span>
+          </div>
+        </div>
+      `;
+        }
+
+        function getSlideFooterHtml(slide, index, isPrint = false) {
+            return `
+        <div class="flex justify-between items-center border-t pt-[1vh] mt-[1.5vh] text-[1.3vh] font-semibold text-slate-400 h-[4vh]">
+          <span>Laporan Saldo & Penyerapan DKS - BL PT Pegadaian (31 Mei 2026)</span>
+          <span class="px-[1.2vw] py-[0.3vh] bg-slate-100 rounded text-slate-600 font-bold text-[1.2vh]">Halaman ${index} dari 7</span>
+        </div>
+      `;
+        }
+
+        function formatCellVal(val) {
+            if (!val) return '-';
+            if (val === '-' || val === '0' || val === '0.00%') return '-';
+
+            // Keep percentages untouched
+            if (val.includes('%')) return val;
+
+            // Negative value indicators styled beautifully
+            if (val.startsWith('-') || val.startsWith('(')) {
+                let cleaned = val.replace(/[\(\)-]/g, '');
+                return `<span class="text-rose-600 font-bold">(${cleaned})</span>`;
+            }
+            return val;
+        }
+
+        // --- STREAMING_CHUNK:Structuring cover, table, and nested table templates ... -->
+        function renderSlideContent(slide, index, isPrint = false) {
+            let html = '';
+
+            if (slide.type === 'cover') {
+                html = `
+          <div class="w-full h-full flex flex-col justify-between p-[6vh] md:p-[8vh] relative overflow-hidden bg-gradient-to-br from-[#1F6F5F] to-[#0F473B] text-white">
+            <!-- Decorative Subtle Vectors -->
+            <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-[5vw] translate-y-[5vh]">
+              <svg class="w-[30vw] h-auto" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="40" stroke="#FFFFFF" stroke-width="8" />
+                <circle cx="80" cy="50" r="30" stroke="#6FCF97" stroke-width="4" />
+              </svg>
+            </div>
+
+            <!-- Top Row of Cover -->
+            <div class="flex justify-between items-center h-[10vh]">
+              <div class="flex items-center gap-2">
+                <span class="text-[1.8vh] font-bold tracking-widest text-emerald-100 uppercase">PT Pegadaian (Persero)</span>
+              </div>
+
+            </div>
+
+            <!-- Main Title Section -->
+            <div class="my-auto space-y-[2vh] max-w-[75vw] py-[2vh]">
+              <div class="h-[0.8vh] w-[8vw] bg-pegadaian-mint rounded-full"></div>
+              <h1 class="text-[4vh] md:text-[4.5vh] font-extrabold tracking-tight text-white leading-tight">
+                ${slide.title}
+              </h1>
+              <p class="text-[2vh] font-medium text-emerald-100/80">
+                Laporan komprehensif penyerapan Dana Kepedulian Sosial (DKS) dan Bina Lingkungan (BL).
+              </p>
+            </div>
+
+            <!-- Bottom Note/Metas Section -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 pt-[2vh] border-t border-white/10 text-white h-[10vh]">
+              <div>
+                <p class="text-[2vh] font-bold text-pegadaian-mint">${slide.date}</p>
+                <p class="text-[1.6vh] opacity-75">${slide.note}</p>
+              </div>
+              <div class="text-[1.4vh] opacity-60">
+                Dokumen Resmi Finansial • Confidential
+              </div>
+            </div>
+          </div>
+        `;
+            } else if (slide.type === 'table') {
+                let headerRow = slide.headers.map(h => `<th class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white text-center py-[0.5vh] px-[0.8vw] text-[1.2vh] font-bold">${h}</th>`).join('');
+
+                let bodyRows = slide.rows.map((row, rIdx) => {
+                    const rowBg = rIdx % 2 === 0 ? 'bg-slate-50' : 'bg-white';
+                    return `
+            <tr class="${rowBg} hover:bg-emerald-50/50 transition-colors">
+              <td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-center text-[1.15vh] font-semibold text-slate-600">${row[0]}</td>
+              <td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-left text-[1.15vh] font-bold text-slate-800">${row[1]}</td>
+              <td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-right text-[1.15vh] num-align text-slate-700">${formatCellVal(row[2])}</td>
+              <td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-right text-[1.15vh] num-align text-slate-700">${formatCellVal(row[3])}</td>
+              <td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-right text-[1.15vh] num-align text-slate-700">${formatCellVal(row[4])}</td>
+              <td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-right text-[1.15vh] num-align text-slate-700">${formatCellVal(row[5])}</td>
+            </tr>
+          `;
+                }).join('');
+
+                let totalRow = `
+          <tr class="bg-emerald-100 print:bg-emerald-100 border-t-2 border-pegadaian-deep font-bold">
+            <td colspan="2" class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-center text-[1.2vh] text-pegadaian-deep font-extrabold uppercase bg-emerald-50">${slide.total[0]}</td>
+            <td class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-right text-[1.15vh] num-align text-pegadaian-deep font-extrabold bg-emerald-50">${slide.total[1]}</td>
+            <td class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-right text-[1.15vh] num-align text-pegadaian-deep font-extrabold bg-emerald-50">${slide.total[2]}</td>
+            <td class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-right text-[1.15vh] num-align text-pegadaian-deep font-extrabold bg-emerald-50">${slide.total[3]}</td>
+            <td class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-right text-[1.15vh] num-align text-pegadaian-deep font-extrabold bg-emerald-50">${slide.total[4]}</td>
+          </tr>
+        `;
+
+                html = `
+          <div class="flex flex-col justify-between w-full h-full bg-white text-slate-900 p-[4vh]">
+            ${getSlideHeaderHtml(slide, isPrint)}
+            
+            <!-- Table Container (Strictly scaled with viewport height) -->
+            <div class="my-auto overflow-hidden rounded-lg border border-slate-300 print:border-slate-400 shadow-sm max-h-[72vh]">
+              <table class="w-full table-auto border-collapse text-left">
+                <thead>
+                  <tr>${headerRow}</tr>
+                </thead>
+                <tbody>
+                  ${bodyRows}
+                  ${totalRow}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-[1vh] text-[1.1vh] font-medium text-slate-500 italic h-[2vh]">
+              ${slide.source}
+            </div>
+
+            ${getSlideFooterHtml(slide, index, isPrint)}
+          </div>
+        `;
+            } else if (slide.type === 'table-nested') {
+                let bodyRows = slide.rows.map((row, rIdx) => {
+                    const rowBg = rIdx % 2 === 0 ? 'bg-slate-50' : 'bg-white';
+
+                    let tdHtml = row.map((cell, cIdx) => {
+                        if (slide.hasSerialNo !== false) {
+                            if (cIdx === 0) {
+                                return `<td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-center text-[1.1vh] font-semibold text-slate-500">${cell}</td>`;
+                            } else if (cIdx === 1) {
+                                return `<td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-left text-[1.1vh] font-bold text-slate-800 whitespace-nowrap">${cell}</td>`;
+                            } else {
+                                let alignClass = "text-right num-align text-slate-700";
+                                let cellContent = formatCellVal(cell);
+                                if (cell.startsWith('-') || cell.startsWith('(') && cIdx === row.length - 1) {
+                                    alignClass = "text-right num-align bg-rose-50/50";
+                                }
+                                return `<td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] ${alignClass} font-medium text-[1.1vh]">${cellContent}</td>`;
+                            }
+                        } else {
+                            if (cIdx === 0) {
+                                return `<td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] text-left text-[1.15vh] font-bold text-slate-800 whitespace-nowrap">${cell}</td>`;
+                            } else {
+                                let alignClass = "text-right num-align text-slate-700";
+                                let cellContent = formatCellVal(cell);
+                                if (cell.startsWith('-') || cell.startsWith('(') && cIdx === row.length - 1) {
+                                    alignClass = "text-right num-align bg-rose-50/50";
+                                }
+                                return `<td class="border border-slate-200 print:border-slate-300 py-[0.4vh] px-[0.8vw] ${alignClass} font-medium text-[1.1vh]">${cellContent}</td>`;
+                            }
+                        }
+                    }).join('');
+
+                    return `<tr class="${rowBg} hover:bg-emerald-50/30 transition-colors">${tdHtml}</tr>`;
+                }).join('');
+
+                const numCols = slide.rows[0].length;
+                const numTotalItems = slide.total.length;
+                const firstColspan = numCols - numTotalItems + 1;
+
+                let totalRowHtml = slide.total.map((cell, cIdx) => {
+                    if (cIdx === 0) {
+                        return `<td ${firstColspan > 1 ? `colspan="${firstColspan}"` : ''} class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-center text-[1.2vh] text-pegadaian-deep font-extrabold uppercase bg-emerald-50">${cell}</td>`;
+                    } else {
+                        return `<td class="border border-slate-200 print:border-slate-400 py-[0.5vh] px-[0.8vw] text-right text-[1.1vh] num-align text-pegadaian-deep font-extrabold bg-emerald-50">${formatCellVal(cell)}</td>`;
+                    }
+                }).join('');
+
+                let totalRow = `<tr class="bg-emerald-100 print:bg-emerald-100 border-t-2 border-pegadaian-deep font-bold">${totalRowHtml}</tr>`;
+
+                html = `
+          <div class="flex flex-col justify-between w-full h-full bg-white text-slate-900 p-[4vh]">
+            ${getSlideHeaderHtml(slide, isPrint)}
+            
+            <!-- Table Box with safe print bounds -->
+            <div class="my-auto overflow-hidden rounded-lg border border-slate-300 print:border-slate-400 shadow-sm max-h-[70vh]">
+              <table class="w-full table-auto border-collapse text-left">
+                <thead>
+                  ${slide.headerStructure}
+                </thead>
+                <tbody>
+                  ${bodyRows}
+                  ${totalRow}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Notes Section with Bitly Link Link for Slide 3 -->
+            <div class="mt-[1vh] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 h-[3.5vh]">
+              <div class="text-[1.1vh] font-medium text-slate-500 italic">
+                ${slide.source}
+              </div>
+              
+              ${slide.note ? `
+              <div class="w-full sm:w-auto px-[1vw] py-[0.2vh] bg-amber-500/10 border border-amber-500/20 rounded-md text-[1.1vh] text-slate-800 flex items-center gap-1.5 animate-pulse">
+                <svg class="w-[1.4vh] h-[1.4vh] text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>${slide.note}</span>
+              </div>` : ''}
+            </div>
+
+            ${getSlideFooterHtml(slide, index, isPrint)}
+          </div>
+        `;
+            }
+
+            return html;
+        }
+
+        // --- STREAMING_CHUNK:Creating rendering engines and page view handlers ... -->
+        function renderActiveSlide() {
+            const activeSlideRoot = document.getElementById('active-slide-root');
+            const slide = slidesData[currentSlide - 1];
+
+            document.getElementById('current-slide-num-badge').innerText = currentSlide;
+            document.getElementById('slide-title-header').innerText = slide.title;
+
+            activeSlideRoot.innerHTML = renderSlideContent(slide, currentSlide, false);
+
+            const dots = document.querySelectorAll('.slide-nav-dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentSlide - 1) {
+                    dot.classList.remove('bg-slate-800', 'text-slate-300');
+                    dot.classList.add('bg-pegadaian-deep', 'text-white', 'ring-2', 'ring-pegadaian-mint');
+                } else {
+                    dot.classList.remove('bg-pegadaian-deep', 'text-white', 'ring-2', 'ring-pegadaian-mint');
+                    dot.classList.add('bg-slate-800', 'text-slate-300');
+                }
+            });
+        }
+
+        function renderPrintSlides() {
+            const listContainer = document.getElementById('print-slides-list');
+            const purePrintWrapper = document.getElementById('pure-print-wrapper');
+
+            let htmlContent = '';
+            slidesData.forEach((slide, idx) => {
+                htmlContent += `
+          <!-- Print Slide Unit ${idx + 1} -->
+          <div class="print-area w-[297mm] h-[167.0625mm] bg-white text-slate-900 overflow-hidden shadow-2xl rounded-2xl flex flex-col justify-between border border-slate-300 print:border-none print:shadow-none print:rounded-none">
+            ${renderSlideContent(slide, idx + 1, true)}
+          </div>
+        `;
+            });
+
+            listContainer.innerHTML = htmlContent;
+            purePrintWrapper.innerHTML = htmlContent;
+        }
+
+        // SLIDE NAVIGATIONS
+        function nextSlide() {
+            if (currentSlide < slidesData.length) {
+                currentSlide++;
+                renderActiveSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                renderActiveSlide();
+            }
+        }
+
+        function goToSlide(num) {
+            currentSlide = num;
+            renderActiveSlide();
+        }
+
+        // --- STREAMING_CHUNK:Binding user controls and keyboard navigation ... -->
+        function toggleViewMode(mode) {
+            viewMode = mode;
+            const interactiveViewport = document.getElementById('interactive-viewport');
+            const printViewContainer = document.getElementById('print-view-container');
+            const btnSlideMode = document.getElementById('btn-slide-mode');
+            const btnPrintMode = document.getElementById('btn-print-mode');
+
+            if (mode === 'slide') {
+                interactiveViewport.classList.remove('hidden');
+                printViewContainer.classList.add('hidden');
+
+                btnSlideMode.className = "px-4 py-2 text-xs font-semibold rounded-lg bg-pegadaian-deep text-white shadow-lg shadow-pegadaian-deep/20 flex items-center gap-2 border border-pegadaian-medium/30 transition-all";
+                btnPrintMode.className = "px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2 border border-slate-700 transition-all";
+            } else {
+                interactiveViewport.classList.add('hidden');
+                printViewContainer.classList.remove('hidden');
+
+                renderPrintSlides();
+
+                btnPrintMode.className = "px-4 py-2 text-xs font-semibold rounded-lg bg-pegadaian-deep text-white shadow-lg shadow-pegadaian-deep/20 flex items-center gap-2 border border-pegadaian-medium/30 transition-all";
+                btnSlideMode.className = "px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2 border border-slate-700 transition-all";
+            }
+        }
+
+        // KEYBOARD BINDS
+        document.addEventListener('keydown', function (event) {
+            if (viewMode === 'slide') {
+                if (event.key === 'ArrowRight' || event.key === 'Space') {
+                    nextSlide();
+                } else if (event.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            }
+        });
+
+        // POPUP MODALS
+        function showHelpModal() {
+            document.getElementById('help-modal').classList.remove('hidden');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').classList.add('hidden');
+        }
+
+        // TRIGGER BATCH PRINT
+        function triggerPrint() {
+            renderPrintSlides();
+            showHelpModal();
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+        // INITIALIZATION
+        window.onload = function () {
+            renderActiveSlide();
+            renderPrintSlides();
+        };
+    </script>
+</body>
+
+</html>
