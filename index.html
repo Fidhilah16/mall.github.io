@@ -153,10 +153,7 @@
         class="no-print bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-md">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-white rounded-lg shadow-sm flex items-center justify-center">
-                <!-- Official Logo PT Pegadaian -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Pegadaian_logo_%282013%29.svg/640px-Pegadaian_logo_%282013%29.svg.png"
-                    class="h-8 w-auto object-contain" alt="Logo Pegadaian"
-                    onerror="this.onerror=null; this.src='https://placehold.co/120x60/1f6f5f/ffffff?text=Pegadaian'">
+            
             </div>
             <div class="border-l border-slate-800 pl-4">
                 <h1 class="text-sm font-semibold text-white">Laporan Keuangan & Penyerapan</h1>
@@ -425,7 +422,6 @@
           <tr>
             <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">NO.</th>
             <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">WILAYAH</th>
-            <th rowspan="2" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">DATA SAP (E)</th>
             <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">BIAYA OPERASIONAL BINA LINGKUNGAN</th>
             <th colspan="3" class="border border-slate-300 print:border-slate-400 bg-pegadaian-deep text-white px-2 py-1 text-center text-[1.2vh] font-bold">BIAYA OPERASIONAL PROGRAM KEMITRAAN</th>
           </tr>
@@ -439,20 +435,20 @@
           </tr>
         `,
                 rows: [
-                    ["1", "KANWIL I MEDAN", "977,244,620", "212,419,770", "0", "212,419,770", "29,800,000", "0", "29,800,000"],
-                    ["2", "KANWIL II PEKANBARU", "1,542,485,195", "108,243,415", "204,000", "108,039,415", "20,600,000", "0", "20,600,000"],
-                    ["3", "KANWIL III PALEMBANG", "1,150,592,426", "147,555,520", "48,331,800", "99,323,720", "7,900,000", "0", "7,900,000"],
-                    ["4", "KANWIL IV BALIKPAPAN", "2,515,849,217", "239,314,030", "47,621,250", "191,692,780", "22,700,000", "0", "22,700,000"],
-                    ["5", "KANWIL V MANADO", "2,379,555,546", "276,819,749", "103,647,308", "173,122,441", "47,100,000", "0", "47,100,000"],
-                    ["6", "KANWIL VI MAKASSAR", "2,254,111,420", "355,817,800", "19,272,735", "336,545,065", "52,600,000", "0", "52,600,000"],
-                    ["7", "KANWIL VII DENPASAR", "3,073,794,703", "314,133,775", "96,353,600", "217,780,175", "26,700,000", "0", "26,700,000"],
-                    ["8", "KANWIL VIII JAKARTA 1", "1,915,976,705", "328,212,020", "59,154,000", "269,058,020", "9,200,000", "0", "9,200,000"],
-                    ["9", "KANWIL IX JAKARTA 2", "1,266,105,355", "273,828,140", "58,625,218", "215,202,922", "12,300,000", "0", "12,300,000"],
-                    ["10", "KANWIL X BANDUNG", "2,596,945,971", "201,686,380", "0", "201,686,380", "24,300,000", "0", "24,300,000"],
-                    ["11", "KANWIL XI SEMARANG", "1,976,866,604", "267,896,010", "25,393,775", "242,502,235", "11,800,000", "0", "11,800,000"],
-                    ["12", "KANWIL XII SURABAYA", "2,689,786,732", "320,410,740", "9,229,850", "311,180,890", "29,600,000", "0", "29,600,000"]
+                    ["1", "KANWIL I MEDAN", "212,419,770", "0", "212,419,770", "29,800,000", "0", "29,800,000"],
+                    ["2", "KANWIL II PEKANBARU", "108,243,415", "204,000", "108,039,415", "20,600,000", "0", "20,600,000"],
+                    ["3", "KANWIL III PALEMBANG", "147,555,520", "48,331,800", "99,323,720", "7,900,000", "0", "7,900,000"],
+                    ["4", "KANWIL IV BALIKPAPAN", "239,314,030", "47,621,250", "191,692,780", "22,700,000", "0", "22,700,000"],
+                    ["5", "KANWIL V MANADO", "276,819,749", "103,647,308", "173,122,441", "47,100,000", "0", "47,100,000"],
+                    ["6", "KANWIL VI MAKASSAR", "355,817,800", "19,272,735", "336,545,065", "52,600,000", "0", "52,600,000"],
+                    ["7", "KANWIL VII DENPASAR","314,133,775", "96,353,600", "217,780,175", "26,700,000", "0", "26,700,000"],
+                    ["8", "KANWIL VIII JAKARTA 1", "328,212,020", "59,154,000", "269,058,020", "9,200,000", "0", "9,200,000"],
+                    ["9", "KANWIL IX JAKARTA 2", "273,828,140", "58,625,218", "215,202,922", "12,300,000", "0", "12,300,000"],
+                    ["10", "KANWIL X BANDUNG", "201,686,380", "0", "201,686,380", "24,300,000", "0", "24,300,000"],
+                    ["11", "KANWIL XI SEMARANG", "267,896,010", "25,393,775", "242,502,235", "11,800,000", "0", "11,800,000"],
+                    ["12", "KANWIL XII SURABAYA", "320,410,740", "9,229,850", "311,180,890", "29,600,000", "0", "29,600,000"]
                 ],
-                total: ["Grand Total", "24,339,314,494", "3,046,437,349", "467,833,536", "2,578,603,813", "294,600,000", "0", "294,600,000"]
+                total: ["Grand Total",  "3,046,437,349", "467,833,536", "2,578,603,813", "294,600,000", "0", "294,600,000"]
             },
             {
                 id: 5,
@@ -631,13 +627,7 @@
                 <span class="text-[1.8vh] font-bold tracking-widest text-emerald-100 uppercase">PT Pegadaian (Persero)</span>
               </div>
               
-              <!-- Official Logo PT Pegadaian with White Card Container -->
-              <div class="bg-white/95 px-[2vw] py-[1.2vh] rounded-xl shadow-md">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Pegadaian_logo_%282013%29.svg/640px-Pegadaian_logo_%282013%29.svg.png" 
-                     class="h-[6vh] w-auto object-contain" 
-                     alt="Logo Pegadaian"
-                     onerror="this.onerror=null; this.src='https://placehold.co/120x60/ffffff/1f6f5f?text=Pegadaian'">
-              </div>
+        
             </div>
 
             <!-- Main Title Section -->
